@@ -3,11 +3,11 @@ const path = require('path');
 
 exports.list = async (req, res) => {
   const services = await Service.find();
-  res.render('services/list', { services });
+  res.render('services/list', { services, title: req?.res?.locals?.t?.services || 'الخدمات' });
 };
 
 exports.addPage = (req, res) => {
-  res.render('services/add');
+  res.render('services/add', { title: req?.res?.locals?.t?.addService || 'إضافة خدمة' });
 };
 
 exports.add = async (req, res) => {
@@ -19,7 +19,7 @@ exports.add = async (req, res) => {
 
 exports.editPage = async (req, res) => {
   const service = await Service.findById(req.params.id);
-  res.render('services/edit', { service });
+  res.render('services/edit', { service, title: req?.res?.locals?.t?.editService || 'تعديل خدمة' });
 };
 
 exports.edit = async (req, res) => {

@@ -1,25 +1,41 @@
-<% layout('layout') -%>
-<h2>إضافة منتج</h2>
-<form method="POST" action="/products/add" enctype="multipart/form-data">
-  <div class="mb-3">
-    <label class="form-label">الاسم</label>
-    <input type="text" name="name" class="form-control" required>
+<%- include('../layout') %>
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-7">
+      <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+          <h4 class="mb-0"><i class="bi bi-plus-circle me-2"></i> إضافة منتج</h4>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="/products/add" enctype="multipart/form-data">
+            <div class="mb-3">
+              <label class="form-label fw-bold"><i class="bi bi-type"></i> الاسم</label>
+              <input type="text" name="name" class="form-control rounded-pill" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold"><i class="bi bi-currency-dollar"></i> السعر</label>
+              <input type="number" name="price" class="form-control rounded-pill" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold"><i class="bi bi-123"></i> الكمية</label>
+              <input type="number" name="quantity" class="form-control rounded-pill" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold"><i class="bi bi-card-text"></i> التفاصيل</label>
+              <textarea name="details" class="form-control rounded-4"></textarea>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-bold"><i class="bi bi-image"></i> الصورة (اختياري)</label>
+              <input type="file" name="image" class="form-control rounded-pill">
+            </div>
+            <div class="d-flex justify-content-between mt-4">
+              <a href="/products" class="btn btn-secondary rounded-pill px-4"><i class="bi bi-arrow-right-circle"></i> رجوع</a>
+              <button type="submit" class="btn btn-success rounded-pill px-4"><i class="bi bi-plus-circle"></i> إضافة</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    <label class="form-label">السعر</label>
-    <input type="number" name="price" class="form-control" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">الكمية</label>
-    <input type="number" name="quantity" class="form-control" required>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">التفاصيل</label>
-    <textarea name="details" class="form-control"></textarea>
-  </div>
-  <div class="mb-3">
-    <label class="form-label">الصورة (اختياري)</label>
-    <input type="file" name="image" class="form-control">
-  </div>
-  <button type="submit" class="btn btn-primary">إضافة</button>
-</form>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

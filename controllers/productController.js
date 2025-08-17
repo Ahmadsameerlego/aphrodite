@@ -7,7 +7,7 @@ exports.list = async (req, res) => {
 };
 
 exports.addPage = (req, res) => {
-  res.render('products/add');
+  res.render('products/add', { title: req?.res?.locals?.t?.addProduct || 'إضافة منتج' });
 };
 
 exports.add = async (req, res) => {
@@ -19,7 +19,7 @@ exports.add = async (req, res) => {
 
 exports.editPage = async (req, res) => {
   const product = await Product.findById(req.params.id);
-  res.render('products/edit', { product });
+  res.render('products/edit', { product, title: req?.res?.locals?.t?.editProduct || 'تعديل منتج' });
 };
 
 exports.edit = async (req, res) => {

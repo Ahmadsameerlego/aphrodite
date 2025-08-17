@@ -1,36 +1,146 @@
 <%- include('layout') %>
-<h2><%= t.appName %></h2>
-<% if (typeof success !== 'undefined') { %>
-  <div class="alert alert-success"><%= t.success || 'تم حفظ العملية بنجاح' %></div>
-<% } %>
-<form method="POST" action="/sales/add">
-  <div class="mb-3">
-    <label class="form-label"><%= t.customerName %> (<%= t.optional || 'اختياري' %>)</label>
-    <input type="text" name="customerName" class="form-control">
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8">
+      <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+          <h4 class="mb-0"><i class="bi bi-cash-coin me-2"></i> <%= t.appName %> - الكاشير</h4>
+        </div>
+        <div class="card-body p-4">
+          <% if (typeof success !== 'undefined') { %>
+            <div class="alert alert-success"><%= t.success || 'تم حفظ العملية بنجاح' %></div>
+          <% } %>
+          <form id="saleForm" method="POST" action="/sales" onsubmit="return prepareItems()">
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-bold"><i class="bi bi-person"></i> <%= t.customerName %> (<%= t.optional || 'اختياري' %>)</label>
+                <input type="text" name="customerName" class="form-control rounded-pill">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-bold"><i class="bi bi-flag"></i> <%= t.customerNationality %> (<%= t.optional || 'اختياري' %>)</label>
+                <input type="text" name="customerNationality" class="form-control rounded-pill">
+              </div>
+            </div>
+            <hr class="my-4">
+            <h5 class="mb-3 text-primary"><i class="bi bi-bag-plus"></i> إضافة عناصر الفاتورة</h5>
+            <div id="items-list"></div>
+            <button type="button" class="btn btn-outline-primary mb-3 rounded-pill" onclick="addItem()">
+              <i class="bi bi-plus-circle"></i> إضافة منتج/خدمة
+            </button>
+            <div class="row g-3 align-items-center mb-3">
+              <div class="col-md-4">
+                <label class="form-label fw-bold"><i class="bi bi-calculator"></i> الإجمالي</label>
+                <input type="text" id="totalPrice" class="form-control form-control-lg text-success fw-bold rounded-pill" readonly>
+              </div>
+            </div>
+            <input type="hidden" name="items" id="itemsInput">
+            <div class="d-flex justify-content-between mt-4">
+              <a href="/dashboard" class="btn btn-secondary rounded-pill px-4"><i class="bi bi-arrow-right-circle"></i> رجوع</a>
+              <button type="submit" class="btn btn-success rounded-pill px-4"><i class="bi bi-save"></i> <%= t.save || 'حفظ العملية' %></button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    <label class="form-label"><%= t.customerNationality %> (<%= t.optional || 'اختياري' %>)</label>
-    <input type="text" name="nationality" class="form-control">
-  </div>
-  <div class="mb-3">
-    <label class="form-label"><%= t.product %>s</label>
-    <select name="products" class="form-select" multiple>
-      <% products.forEach(p => { %>
-        <option value='<%= JSON.stringify({product: p._id, price: p.price, quantity: 1}) %>'><%= p.name %> - <%= p.price %> <%= t.currency || 'جنيه' %> (<%= t.available || 'المتوفر' %>: <%= p.quantity %>)</option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="mb-3">
-    <label class="form-label"><%= t.service %>s</label>
-    <select name="services" class="form-select" multiple>
-      <% services.forEach(s => { %>
-        <option value='<%= JSON.stringify({service: s._id, price: s.price}) %>'><%= s.name %> - <%= s.price %> <%= t.currency || 'جنيه' %></option>
-      <% }) %>
-    </select>
-  </div>
-  <div class="mb-3">
-    <label class="form-label"><%= t.totalAll %></label>
-    <input type="number" name="total" class="form-control" required>
-  </div>
-  <button type="submit" class="btn btn-primary"><%= t.save || 'حفظ العملية' %></button>
-</form>
+</div>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<style>
+.card {
+  border-radius: 1.2rem;
+}
+.form-label {
+  font-size: 1.05rem;
+}
+.form-control, .btn {
+  font-size: 1.08rem;
+}
+.btn-outline-primary {
+  border-width: 2px;
+}
+.btn-success, .btn-primary {
+  box-shadow: 0 2px 8px rgba(80,80,180,0.08);
+}
+.btn-success:hover, .btn-primary:hover {
+  box-shadow: 0 4px 16px rgba(80,80,180,0.13);
+}
+.rounded-pill {
+  border-radius: 50rem!important;
+}
+</style>
+<script>
+var products = JSON.parse(decodeURIComponent("<%- encodeURIComponent(JSON.stringify(products)) %>"));
+var services = JSON.parse(decodeURIComponent("<%- encodeURIComponent(JSON.stringify(services)) %>"));
+let items = [];
+function addItem() {
+  items.push({ type: '', id: '', name: '', price: 0, quantity: 1 });
+  renderItems();
+}
+function removeItem(idx) {
+  items.splice(idx, 1);
+  renderItems();
+}
+function updateItem(idx, field, value) {
+  if (field === 'type') {
+    items[idx].type = value;
+    items[idx].id = '';
+    items[idx].name = '';
+    items[idx].price = 0;
+    items[idx].quantity = 1;
+  } else if (field === 'id') {
+    let list = items[idx].type === 'product' ? products : services;
+    let found = list.find(x => x._id === value);
+    items[idx].id = value;
+    items[idx].name = found ? found.name : '';
+    items[idx].price = found ? found.price : 0;
+    items[idx].quantity = 1;
+  } else if (field === 'quantity') {
+    items[idx].quantity = parseInt(value) || 1;
+  }
+  renderItems();
+}
+function renderItems() {
+  let html = '';
+  let total = 0;
+  items.forEach((item, idx) => {
+    let options = '';
+    if (item.type === 'product') {
+      options = products.map(p => `<option value="${p._id}" ${item.id===p._id?'selected':''}>${p.name} (${p.price} جنيه)</option>`).join('');
+    } else if (item.type === 'service') {
+      options = services.map(s => `<option value="${s._id}" ${item.id===s._id?'selected':''}>${s.name} (${s.price} جنيه)</option>`).join('');
+    }
+    total += (item.price * item.quantity);
+    html += `<div class='row align-items-end mb-2'>
+      <div class='col-3'>
+        <select class='form-select rounded-pill' onchange='updateItem(${idx},"type",this.value)'>
+          <option value=''>اختر النوع</option>
+          <option value='product' ${item.type==='product'?'selected':''}>منتج</option>
+          <option value='service' ${item.type==='service'?'selected':''}>خدمة</option>
+        </select>
+      </div>
+      <div class='col-4'>
+        <select class='form-select rounded-pill' onchange='updateItem(${idx},"id",this.value)'>
+          <option value=''>اختر</option>
+          ${options}
+        </select>
+      </div>
+      <div class='col-2'>
+        <input type='number' min='1' class='form-control rounded-pill' value='${item.quantity}' onchange='updateItem(${idx},"quantity",this.value)'>
+      </div>
+      <div class='col-2'>
+        <input type='text' class='form-control rounded-pill' value='${item.price * item.quantity}' readonly>
+      </div>
+      <div class='col-1'>
+        <button type='button' class='btn btn-danger btn-sm rounded-pill' onclick='removeItem(${idx})'><i class='bi bi-trash'></i></button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('items-list').innerHTML = html;
+  document.getElementById('totalPrice').value = total;
+}
+function prepareItems() {
+  document.getElementById('itemsInput').value = JSON.stringify(items.filter(i=>i.type&&i.id));
+  return true;
+}
+addItem();
+</script>
