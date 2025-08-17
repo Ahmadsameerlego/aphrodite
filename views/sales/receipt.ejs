@@ -1,0 +1,75 @@
+<%- include('../layout') %>
+<style>
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff !important; }
+}
+.invoice-box {
+  max-width: 700px;
+  margin: auto;
+  padding: 30px;
+  border: 1px solid #eee;
+  background: #fff;
+  direction: rtl;
+  font-family: 'Cairo', Tahoma, Arial, sans-serif;
+}
+.invoice-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.invoice-header img {
+  max-height: 60px;
+  margin-bottom: 10px;
+}
+.invoice-table th, .invoice-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+</style>
+<div class="invoice-box shadow">
+  <div class="invoice-header">
+    <img src="/logo.png" alt="شعار المحل" onerror="this.style.display='none'">
+    <h3 class="mb-1">كوافير ومحل مستحضرات تجميل</h3>
+    <div>العنوان: شارع الجمال، القاهرة</div>
+    <div>الهاتف: 01000000000</div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-6"><strong>رقم الفاتورة:</strong> <%= sale._id.toString().slice(-6) %></div>
+    <div class="col-6 text-end"><strong>التاريخ:</strong> <%= sale.createdAt ? sale.createdAt.toLocaleDateString('ar-EG') : '-' %></div>
+  </div>
+  <div class="row mb-3">
+    <div class="col-6"><strong>اسم العميل:</strong> <%= sale.customerName || '-' %></div>
+    <div class="col-6 text-end"><strong>الجنسية:</strong> <%= sale.customerNationality || '-' %></div>
+  </div>
+  <table class="table table-bordered invoice-table">
+    <thead class="table-light">
+      <tr>
+        <th>النوع</th>
+        <th>الاسم</th>
+        <th>الكمية</th>
+        <th>السعر</th>
+        <th>الإجمالي</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% sale.items.forEach(item => { %>
+        <tr>
+          <td><%= item.type === 'product' ? 'منتج' : 'خدمة' %></td>
+          <td><%= item.name %></td>
+          <td><%= item.quantity %></td>
+          <td><%= item.price %> جنيه</td>
+          <td><%= item.price * item.quantity %> جنيه</td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <div class="row mb-2">
+    <div class="col-6"><strong>اسم الكاشير:</strong> <%= sale.cashierName %></div>
+    <div class="col-6 text-end"><strong>الإجمالي الكلي:</strong> <span class="fs-5 text-success"><%= sale.totalPrice %> جنيه</span></div>
+  </div>
+  <div class="text-center mt-4">
+    <button class="btn btn-primary no-print" onclick="window.print()">🖨 طباعة</button>
+    <a href="/sales/new" class="btn btn-secondary no-print">فاتورة جديدة</a>
+    <a href="/cashier" class="btn btn-outline-secondary no-print">رجوع</a>
+  </div>
+</div>

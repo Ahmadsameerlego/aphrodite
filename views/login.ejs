@@ -1,0 +1,42 @@
+<%- include('layout') %>
+<h2 class="mb-4 text-center"><%= t.login || 'تسجيل الدخول' %></h2>
+<% if (typeof error !== 'undefined') { %>
+  <div class="alert alert-danger text-center"><%= error %></div>
+<% } %>
+<form method="POST" action="/login" class="card p-3 mx-auto" style="max-width:400px;">
+  <div class="mb-3">
+    <label class="form-label"><%= t.userType || 'نوع المستخدم' %></label>
+    <select name="role" class="form-select" required onchange="toggleLoginFields(this.value)">
+      <option value=""><%= t.choose || 'اختر...' %></option>
+      <option value="admin" <%= role==='admin' ? 'selected' : '' %>><%= t.admin || 'أدمن' %></option>
+      <option value="cashier" <%= role==='cashier' ? 'selected' : '' %>><%= t.cashier || 'كاشير' %></option>
+    </select>
+  </div>
+  <div id="admin-fields" style='display: <%= role==="admin" ? "block" : "none" %>;'>
+    <div class="mb-3">
+      <label class="form-label"><%= t.phone || 'رقم التليفون' %></label>
+      <input type="text" name="phone" class="form-control" <%= role==='admin' ? 'required' : '' %>>
+    </div>
+    <div class="mb-3">
+      <label class="form-label"><%= t.password || 'كلمة المرور' %></label>
+  <input type="password" name="password" class="form-control" <%= role==='admin' ? 'required' : '' %>>
+    </div>
+  </div>
+  <div id="cashier-fields" style='display: <%= role==="cashier" ? "block" : "none" %>;'>
+    <div class="mb-3">
+      <label class="form-label"><%= t.username || 'اسم المستخدم' %></label>
+      <input type="text" name="username" class="form-control" <%= role==='cashier' ? 'required' : '' %>>
+    </div>
+    <div class="mb-3">
+      <label class="form-label"><%= t.password || 'كلمة المرور' %></label>
+  <input type="password" name="cashierPassword" class="form-control" <%= role==='cashier' ? 'required' : '' %>>
+    </div>
+  </div>
+  <button type="submit" class="btn btn-primary w-100"><%= t.login || 'دخول' %></button>
+</form>
+<script>
+function toggleLoginFields(role) {
+  document.getElementById('admin-fields').style.display = role === 'admin' ? 'block' : 'none';
+  document.getElementById('cashier-fields').style.display = role === 'cashier' ? 'block' : 'none';
+}
+</script>

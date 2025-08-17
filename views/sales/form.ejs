@@ -1,0 +1,101 @@
+<%- include('../layout') %>
+<h2 class="mb-3">إضافة عملية بيع جديدة</h2>
+<form id="saleForm" method="POST" action="/sales" onsubmit="return prepareItems()">
+  <div class="row mb-3">
+    <div class="col-md-6 mb-2">
+      <label class="form-label">اسم العميل (اختياري)</label>
+      <input type="text" name="customerName" class="form-control">
+    </div>
+    <div class="col-md-6 mb-2">
+      <label class="form-label">جنسية العميل (اختياري)</label>
+      <input type="text" name="customerNationality" class="form-control">
+    </div>
+  </div>
+  <div id="items-list"></div>
+  <button type="button" class="btn btn-outline-primary mb-3" onclick="addItem()">إضافة منتج/خدمة</button>
+  <div class="mb-3">
+    <label class="form-label">الإجمالي</label>
+    <input type="text" id="totalPrice" class="form-control" readonly>
+  </div>
+  <input type="hidden" name="items" id="itemsInput">
+  <div class="d-flex justify-content-between">
+    <a href="/cashier" class="btn btn-secondary">رجوع</a>
+    <button type="submit" class="btn btn-success">حفظ العملية</button>
+  </div>
+</form>
+<script>
+var products = JSON.parse(decodeURIComponent("<%- encodeURIComponent(JSON.stringify(products)) %>"));
+var services = JSON.parse(decodeURIComponent("<%- encodeURIComponent(JSON.stringify(services)) %>"));
+let items = [];
+function addItem() {
+  items.push({ type: '', id: '', name: '', price: 0, quantity: 1 });
+  renderItems();
+}
+function removeItem(idx) {
+  items.splice(idx, 1);
+  renderItems();
+}
+function updateItem(idx, field, value) {
+  if (field === 'type') {
+    items[idx].type = value;
+    items[idx].id = '';
+    items[idx].name = '';
+    items[idx].price = 0;
+    items[idx].quantity = 1;
+  } else if (field === 'id') {
+    let list = items[idx].type === 'product' ? products : services;
+    let found = list.find(x => x._id === value);
+    items[idx].id = value;
+    items[idx].name = found ? found.name : '';
+    items[idx].price = found ? found.price : 0;
+    items[idx].quantity = 1;
+  } else if (field === 'quantity') {
+    items[idx].quantity = parseInt(value) || 1;
+  }
+  renderItems();
+}
+function renderItems() {
+  let html = '';
+  let total = 0;
+  items.forEach((item, idx) => {
+    let options = '';
+    if (item.type === 'product') {
+      options = products.map(p => `<option value="${p._id}" ${item.id===p._id?'selected':''}>${p.name} (${p.price} جنيه)</option>`).join('');
+    } else if (item.type === 'service') {
+      options = services.map(s => `<option value="${s._id}" ${item.id===s._id?'selected':''}>${s.name} (${s.price} جنيه)</option>`).join('');
+    }
+    total += (item.price * item.quantity);
+    html += `<div class='row align-items-end mb-2'>
+      <div class='col-3'>
+        <select class='form-select' onchange='updateItem(${idx},"type",this.value)'>
+          <option value=''>اختر النوع</option>
+          <option value='product' ${item.type==='product'?'selected':''}>منتج</option>
+          <option value='service' ${item.type==='service'?'selected':''}>خدمة</option>
+        </select>
+      </div>
+      <div class='col-4'>
+        <select class='form-select' onchange='updateItem(${idx},"id",this.value)'>
+          <option value=''>اختر</option>
+          ${options}
+        </select>
+      </div>
+      <div class='col-2'>
+        <input type='number' min='1' class='form-control' value='${item.quantity}' onchange='updateItem(${idx},"quantity",this.value)'>
+      </div>
+      <div class='col-2'>
+        <input type='text' class='form-control' value='${item.price * item.quantity}' readonly>
+      </div>
+      <div class='col-1'>
+        <button type='button' class='btn btn-danger btn-sm' onclick='removeItem(${idx})'>حذف</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('items-list').innerHTML = html;
+  document.getElementById('totalPrice').value = total;
+}
+function prepareItems() {
+  document.getElementById('itemsInput').value = JSON.stringify(items.filter(i=>i.type&&i.id));
+  return true;
+}
+addItem();
+</script>

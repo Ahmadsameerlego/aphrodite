@@ -1,0 +1,33 @@
+<%- include('../layout') %>
+<h2 class="mb-3">سجل المبيعات</h2>
+<table class="table table-bordered table-striped table-responsive">
+  <thead class="table-light">
+    <tr>
+      <th>التاريخ</th>
+      <th>اسم العميل</th>
+      <th>الجنسية</th>
+      <th>اسم الكاشير</th>
+      <th>الإجمالي</th>
+      <th>العناصر</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% sales.forEach(sale => { %>
+      <tr>
+        <td><%= sale.createdAt ? sale.createdAt.toLocaleDateString('ar-EG') : '-' %></td>
+        <td><%= sale.customerName || '-' %></td>
+        <td><%= sale.customerNationality || '-' %></td>
+        <td><%= sale.cashierName %></td>
+        <td><%= sale.totalPrice %> جنيه</td>
+        <td>
+          <ul class="mb-0">
+            <% sale.items.forEach(item => { %>
+              <li><%= item.type === 'product' ? 'منتج' : 'خدمة' %> - <%= item.name %> (<%= item.price %> × <%= item.quantity %>)</li>
+            <% }) %>
+          </ul>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+<a href="/dashboard" class="btn btn-secondary">رجوع</a>

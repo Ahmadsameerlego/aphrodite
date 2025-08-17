@@ -1,0 +1,28 @@
+<% layout('layout') -%>
+<h2>تعديل منتج</h2>
+<form method="POST" action="/products/edit/<%= product._id %>" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">الاسم</label>
+    <input type="text" name="name" class="form-control" value="<%= product.name %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">السعر</label>
+    <input type="number" name="price" class="form-control" value="<%= product.price %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">الكمية</label>
+    <input type="number" name="quantity" class="form-control" value="<%= product.quantity %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">التفاصيل</label>
+    <textarea name="details" class="form-control"><%= product.details %></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">الصورة (اختياري)</label>
+    <input type="file" name="image" class="form-control">
+    <% if (product.image) { %>
+      <img src="<%= product.image %>" width="80">
+    <% } %>
+  </div>
+  <button type="submit" class="btn btn-primary">تعديل</button>
+</form>

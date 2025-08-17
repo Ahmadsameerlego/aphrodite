@@ -1,0 +1,21 @@
+<% layout('layout') -%>
+<h2>إضافة خدمة</h2>
+<form method="POST" action="/services/add" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">الاسم</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">السعر</label>
+    <input type="number" name="price" class="form-control" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">التفاصيل</label>
+    <textarea name="details" class="form-control"></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">الصورة (اختياري)</label>
+    <input type="file" name="image" class="form-control">
+  </div>
+  <button type="submit" class="btn btn-primary">إضافة</button>
+</form>

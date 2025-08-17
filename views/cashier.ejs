@@ -1,0 +1,36 @@
+<%- include('layout') %>
+<h2><%= t.appName %></h2>
+<% if (typeof success !== 'undefined') { %>
+  <div class="alert alert-success"><%= t.success || 'تم حفظ العملية بنجاح' %></div>
+<% } %>
+<form method="POST" action="/sales/add">
+  <div class="mb-3">
+    <label class="form-label"><%= t.customerName %> (<%= t.optional || 'اختياري' %>)</label>
+    <input type="text" name="customerName" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label class="form-label"><%= t.customerNationality %> (<%= t.optional || 'اختياري' %>)</label>
+    <input type="text" name="nationality" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label class="form-label"><%= t.product %>s</label>
+    <select name="products" class="form-select" multiple>
+      <% products.forEach(p => { %>
+        <option value='<%= JSON.stringify({product: p._id, price: p.price, quantity: 1}) %>'><%= p.name %> - <%= p.price %> <%= t.currency || 'جنيه' %> (<%= t.available || 'المتوفر' %>: <%= p.quantity %>)</option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label"><%= t.service %>s</label>
+    <select name="services" class="form-select" multiple>
+      <% services.forEach(s => { %>
+        <option value='<%= JSON.stringify({service: s._id, price: s.price}) %>'><%= s.name %> - <%= s.price %> <%= t.currency || 'جنيه' %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label"><%= t.totalAll %></label>
+    <input type="number" name="total" class="form-control" required>
+  </div>
+  <button type="submit" class="btn btn-primary"><%= t.save || 'حفظ العملية' %></button>
+</form>

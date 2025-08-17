@@ -1,0 +1,38 @@
+<%- include('../layout') %>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">الخدمات</h2>
+  <a href="/services/add" class="btn btn-success">إضافة خدمة</a>
+</div>
+<table class="table table-bordered table-striped table-responsive">
+  <thead class="table-light">
+    <tr>
+      <th>الاسم</th>
+      <th>السعر</th>
+      <th>التفاصيل</th>
+      <th>الصورة</th>
+      <th>تاريخ الإضافة</th>
+      <th>إجراءات</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% services.forEach(s => { %>
+      <tr>
+        <td><%= s.name %></td>
+        <td><%= s.price %> جنيه</td>
+        <td><%= s.details || '-' %></td>
+        <td>
+          <% if (s.image) { %>
+            <img src="data:image/jpeg;base64,<%= s.image.toString('base64') %>" width="60" height="60" style="object-fit:cover;">
+          <% } else { %> - <% } %>
+        </td>
+        <td><%= s.createdAt ? s.createdAt.toLocaleDateString('ar-EG') : '-' %></td>
+        <td>
+          <a href="/services/edit/<%= s._id %>" class="btn btn-warning btn-sm">تعديل</a>
+          <form action="/services/<%= s._id %>?_method=DELETE" method="POST" style="display:inline">
+            <button class="btn btn-danger btn-sm" onclick="return confirm('هل أنت متأكد من الحذف؟')">حذف</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>

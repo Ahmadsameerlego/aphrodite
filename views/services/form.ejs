@@ -1,0 +1,27 @@
+<%- include('../layout') %>
+<h2 class="mb-3"><%= title %></h2>
+<form method="POST" action="<%= action %>" enctype="multipart/form-data" class="card p-3 mx-auto" style="max-width:500px;">
+  <div class="mb-3">
+    <label class="form-label">اسم الخدمة</label>
+    <input type="text" name="name" class="form-control" value="<%= service.name || '' %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">السعر</label>
+    <input type="number" name="price" class="form-control" value="<%= service.price || '' %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">تفاصيل الخدمة</label>
+    <textarea name="details" class="form-control"><%= service.details || '' %></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">صورة الخدمة (اختياري)</label>
+    <input type="file" name="image" class="form-control">
+    <% if (service.image) { %>
+      <img src="data:image/jpeg;base64,<%= service.image.toString('base64') %>" width="80" height="80" style="object-fit:cover;" class="mt-2">
+    <% } %>
+  </div>
+  <div class="d-flex justify-content-between">
+    <a href="/services" class="btn btn-secondary">رجوع</a>
+    <button type="submit" class="btn btn-primary"><%= title.includes('تعديل') ? 'تحديث' : 'إضافة' %></button>
+  </div>
+</form>

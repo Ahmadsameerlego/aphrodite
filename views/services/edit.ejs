@@ -1,0 +1,24 @@
+<% layout('layout') -%>
+<h2>تعديل خدمة</h2>
+<form method="POST" action="/services/edit/<%= service._id %>" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">الاسم</label>
+    <input type="text" name="name" class="form-control" value="<%= service.name %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">السعر</label>
+    <input type="number" name="price" class="form-control" value="<%= service.price %>" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">التفاصيل</label>
+    <textarea name="details" class="form-control"><%= service.details %></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">الصورة (اختياري)</label>
+    <input type="file" name="image" class="form-control">
+    <% if (service.image) { %>
+      <img src="<%= service.image %>" width="80">
+    <% } %>
+  </div>
+  <button type="submit" class="btn btn-primary">تعديل</button>
+</form>

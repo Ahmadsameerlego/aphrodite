@@ -1,0 +1,36 @@
+<% layout('layout') -%>
+<h2>التقارير</h2>
+<form method="GET" class="row g-3 mb-3">
+  <div class="col-auto">
+    <label>من</label>
+    <input type="date" name="from" class="form-control" value="<%= from || '' %>">
+  </div>
+  <div class="col-auto">
+    <label>إلى</label>
+    <input type="date" name="to" class="form-control" value="<%= to || '' %>">
+  </div>
+  <div class="col-auto align-self-end">
+    <button class="btn btn-secondary">تصفية</button>
+  </div>
+</form>
+<div class="mb-3">
+  <strong>إجمالي المبيعات:</strong> <%= totalSales %> جنيه
+  <br>
+  <strong>عدد العمليات:</strong> <%= count %>
+</div>
+<table class="table table-bordered">
+  <thead>
+    <tr><th>التاريخ</th><th>اسم العميل</th><th>الجنسية</th><th>الموظف</th><th>الإجمالي</th></tr>
+  </thead>
+  <tbody>
+    <% sales.forEach(s => { %>
+      <tr>
+        <td><%= s.date.toLocaleDateString('ar-EG') %></td>
+        <td><%= s.customerName || '-' %></td>
+        <td><%= s.nationality || '-' %></td>
+        <td><%= s.employee %></td>
+        <td><%= s.total %></td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
