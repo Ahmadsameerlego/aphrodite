@@ -31,8 +31,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    collectionName: 'sessions'
+      mongoUrl: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/beautyshop",
+  dbName: "beautyshop",
+  collectionName: "sessions"
+
   }),
   cookie: { maxAge: 1000 * 60 * 60 * 24 }
 }));
