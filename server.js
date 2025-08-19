@@ -50,6 +50,7 @@ app.use(session({
     sameSite: "strict"
   }
 }));
+console.log("MONGO_URI from env:", process.env.MONGO_URI);
 
 // لغة الموقع
 const languages = {};
