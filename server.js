@@ -5,8 +5,17 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const methodOverride = require('method-override');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
+
+// ✅ تحقق من قراءة المتغيرات
+if (!process.env.MONGO_URI) {
+  console.error("❌ Error: MONGO_URI is not defined. Check your .env file!");
+  process.exit(1);
+} else {
+  console.log("✅ MONGO_URI loaded:", process.env.MONGO_URI);
+}
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI, {
@@ -16,7 +25,7 @@ mongoose.connect(process.env.MONGO_URI, {
 .then(() => console.log('✅ MongoDB Atlas connected'))
 .catch(err => {
   console.error('❌ MongoDB connection error:', err);
-  process.exit(1); // وقف السيرفر لو الاتصال فشل
+  process.exit(1);
 });
 
 // Middleware
@@ -25,36 +34,40 @@ app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Session (يجب أن يكون قبل أي ميدل وير يستخدم req.session)
+// Session (لازم يكون قبل أي ميدل وير بيستخدم req.session)
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "fallback-secret",
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/beautyshop",
-  dbName: "beautyshop",
-  collectionName: "sessions"
-
+    mongoUrl: process.env.MONGO_URI,
+    collectionName: 'sessions'
   }),
-  cookie: { maxAge: 1000 * 60 * 60 * 24 }
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24, // يوم
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: "strict"
+  }
 }));
 
 // لغة الموقع
-const fs = require('fs');
+const languages = {};
+['ar', 'en'].forEach(l => {
+  const filePath = path.join(__dirname, 'lang', `${l}.json`);
+  if (fs.existsSync(filePath)) {
+    languages[l] = JSON.parse(fs.readFileSync(filePath));
+  }
+});
+
 app.use((req, res, next) => {
   let lang = req.session.lang || 'ar';
-  if (req.query.lang && ['ar','en'].includes(req.query.lang)) {
+  if (req.query.lang && ['ar', 'en'].includes(req.query.lang)) {
     lang = req.query.lang;
     req.session.lang = lang;
   }
-  try {
-    const langFile = fs.readFileSync(path.join(__dirname, 'lang', lang + '.json'));
-    res.locals.t = JSON.parse(langFile);
-    res.locals.lang = lang;
-  } catch {
-    res.locals.t = {};
-    res.locals.lang = 'ar';
-  }
+  res.locals.t = languages[lang] || {};
+  res.locals.lang = lang;
   next();
 });
 
@@ -73,6 +86,12 @@ app.use('/reports', require('./routes/reportRoutes'));
 // 404
 app.use((req, res) => {
   res.status(404).render('404', { title: 'الصفحة غير موجودة' });
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+  console.error("🔥 Server Error:", err);
+  res.status(500).render('500', { title: 'خطأ في السيرفر' });
 });
 
 const PORT = process.env.PORT || 3000;
