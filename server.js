@@ -35,6 +35,8 @@ app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Session (لازم يكون قبل أي ميدل وير بيستخدم req.session)
+app.set('trust proxy', 1); // لازم قبل session
+
 app.use(session({
   secret: process.env.SESSION_SECRET || "fallback-secret",
   resave: false,
